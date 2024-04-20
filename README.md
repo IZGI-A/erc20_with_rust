@@ -1,1 +1,1 @@
-# erc20-_with-_rust
+# erc20_with_rust
