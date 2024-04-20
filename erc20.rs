@@ -1,14 +1,14 @@
 
 use ink_lang as ink;
 
-#[int::contract]
+#[ink::contract]
 mod erc20_token {
-    use ink_prelude::vec::Vec;
+    use ink::prelude::{vec, vec::Vec};
     #[ink(storage)]
     pub struct Erc20Token {
         total_supply: Balance,
-        balances: ink_storage::collections::HashMap<AccountId, Balance>,
-        allowances: ink_storage::collections::HashMap<(AccountId, AccountId), Balance>,
+        balances: ink::prelude::collections::HashMap<AccountId, Balance>,
+        allowances: ink::prelude::collections::HashMap<(AccountId, AccountId), Balance>,
     }
 
     #[ink(event)]
@@ -30,13 +30,13 @@ mod erc20_token {
         #[ink(constructor)]
         pub fn new(initial_supply: Balance) -> Self {
             let caller = Self::env().caller();
-            let mut balances = ink_storage::collections::HashMap::new();
+            let mut balances = ink::prelude::collections::HashMap::new();
             balances.insert(caller, initial_supply);
 
             Self {
                 total_supply: initial_supply,
                 balances,
-                allowances: ink_storage::collections::HashMap::new(),
+                allowances: ink::prelude::collections::HashMap::new(),
                 
             }
         }
@@ -101,7 +101,33 @@ mod erc20_token {
             true
         }
     }
-    
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+        use ink_env::test::DefaultEnvironment;
+
+        #[ink::test]
+        fn it_works() {
+            let accounts = ink_env::test::default_accounts::<ink_env::DefaultEnvironment>().expect("Cannot get accounts");
+
+            let mut erc20_token = Erc20Token::new(1_000);
+            assert_eq!(erc20_token.total_supply(), 1_000);
+            assert_eq!(erc20_token.balance_of(accounts.alice), 1_000);
+
+            assert!(erc20_token.transfer(accounts.bob, 500));
+            assert_eq!(erc20_token.balance_of(accounts.alice), 500);
+            assert_eq!(erc20_token.balance_of(accounts.bob), 500);
+
+            assert!(erc20_token.approve(accounts.charlie, 200));
+            assert_eq!(erc20_token.approve(accounts.alice, accounts.charlie), 200);
+
+            assert!(erc20_token.transfer_from(accounts.alice, accounts.charlie, 200));
+            assert_eq!(erc20_token.balance_of(accounts.alice), 300);
+            assert_eq!(erc20_token.balance_of(accounts.bob), 200);
+
+
+        }
+    }
 
 
 }
