@@ -7,8 +7,8 @@ mod erc20_token {
     #[ink(storage)]
     pub struct Erc20Token {
         total_supply: Balance,
-        balances: ink::prelude::collections::HashMap<AccountId, Balance>,
-        allowances: ink::prelude::collections::HashMap<(AccountId, AccountId), Balance>,
+        balances: ink_storage::collections::HashMap<AccountId, Balance>,
+        allowances: ink_storage::collections::HashMap<(AccountId, AccountId), Balance>,
     }
 
     #[ink(event)]
@@ -30,13 +30,13 @@ mod erc20_token {
         #[ink(constructor)]
         pub fn new(initial_supply: Balance) -> Self {
             let caller = Self::env().caller();
-            let mut balances = ink::prelude::collections::HashMap::new();
+            let mut balances = ink_storage::collections::HashMap::new();
             balances.insert(caller, initial_supply);
 
             Self {
                 total_supply: initial_supply,
                 balances,
-                allowances: ink::prelude::collections::HashMap::new(),
+                allowances: ink_storage::collections::HashMap::new(),
                 
             }
         }
